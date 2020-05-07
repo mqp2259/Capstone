@@ -32,7 +32,7 @@ class Movie(db.Model):
     # Movie title
     title = db.Column(db.String(80), unique=True)
     # Release date
-    release_time = db.Column(db.DateTime(), nullable=False)
+    release_date = db.Column(db.DateTime())
 
     def __repr__(self):
         return 'Movie: title=%s, y=%s' % (self.title, self.release_time)
@@ -53,4 +53,4 @@ class Actor(db.Model):
     gender = db.Column(db.String(80))
 
     def __repr__(self):
-        return 'Actor: name=%s, age=%d, gender=%s' % (self.title, self.age, self.gender)
+        return 'Actor: name=%s, age=%d, gender=%s' % (self.name, self.age, self.gender)

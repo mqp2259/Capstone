@@ -152,10 +152,10 @@ def create_app(test_config=None):
         })
 
     '''
-    Add an movie.
+    Add a movie.
     '''
     @app.route('/movies', methods=['POST'])
-    def add_movies():
+    def add_movie():
         body = request.get_json()
         title = body.get('title', None)
         release_date = body.get('release_date', None)
@@ -180,6 +180,72 @@ def create_app(test_config=None):
             'added': new_movie.format(),
         })
 
+    '''
+    Update an actor.
+    '''
+    @app.route('/actors/<int:id>', methods=['PATCH'])
+    def update_actor(id):
+        actor = Actor.query.filter(Actor.id == id).one_or_none()
+
+        if actor is None:
+            abort(404)
+
+        body = request.get_json()
+        name = body.get('name', None)
+        age = body.get('age', None)
+        gender = body.get('gender', None)
+
+        if name is not None:
+            actor.name = name
+
+        if age is not None:
+            actor.age = age
+
+        if gender is not None:
+            actor.gender = gender
+
+        try:
+            actor.update()
+        except:
+            abort(422)
+
+        return jsonify({
+            'success': True,
+            'updated': actor.format(),
+        })
+
+    '''
+    Update a movie.
+    '''
+    @app.route('/movies/<int:id>', methods=['PATCH'])
+    def update_movie(id):
+        movie = Movie.query.filter(Movie.id == id).one_or_none()
+
+        if movie is None:
+            abort(404)
+
+        body = request.get_json()
+        title = body.get('title', None)
+        release_date = body.get('release_date', None)
+
+        if title is not None:
+            movie.title = title
+
+        if release_date is not None:
+            try:
+                movie.release_date = datetime.strptime(release_date, "%Y-%m-%d")
+            except:
+                abort(422)
+
+        try:
+            movie.update()
+        except:
+            abort(422)
+
+        return jsonify({
+            'success': True,
+            'updated': movie.format(),
+        })
 
     '''
     Error handlers

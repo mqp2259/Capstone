@@ -3,11 +3,8 @@ from flask import request, _request_ctx_stack
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
+from auth.config import *
 
-
-AUTH0_DOMAIN = 'mqp2259.auth0.com'
-ALGORITHMS = ['RS256']
-API_AUDIENCE = 'coffeeshop'
 
 ## AuthError Exception
 '''

@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from database.models import *
 from datetime import datetime
+from auth.auth import *
 
 
 def create_app(test_config=None):
@@ -16,7 +17,8 @@ def create_app(test_config=None):
     GET all available actors.
     '''
     @app.route('/actors')
-    def get_actors():
+    @requires_auth('get:actors')
+    def get_actors(jwt):
         actors = Actor.query.order_by(Actor.id).all()
 
         formatted_actors = [actor.format() for actor in actors]
@@ -34,7 +36,8 @@ def create_app(test_config=None):
     GET all available movies.
     '''
     @app.route('/movies')
-    def get_movies():
+    @requires_auth('get:movies')
+    def get_movies(jwt):
 
         movies = Movie.query.order_by(Movie.id).all()
 
@@ -53,7 +56,8 @@ def create_app(test_config=None):
     GET the actor by id.
     '''
     @app.route('/actors/<int:id>')
-    def get_actor_by_id(id):
+    @requires_auth('get:actors')
+    def get_actor_by_id(jwt, id):
         actor = Actor.query.filter(Actor.id == id).one_or_none()
 
         if actor is None:
@@ -71,7 +75,8 @@ def create_app(test_config=None):
     GET the movie by id.
     '''
     @app.route('/movies/<int:id>')
-    def get_movie_by_id(id):
+    @requires_auth('get:movies')
+    def get_movie_by_id(jwt, id):
         movie = Movie.query.filter(Movie.id == id).one_or_none()
 
         if movie is None:
@@ -89,7 +94,8 @@ def create_app(test_config=None):
     DELETE the actor by id.
     '''
     @app.route('/actors/<int:id>', methods=['DELETE'])
-    def delete_actor_by_id(id):
+    @requires_auth('delete:actors')
+    def delete_actor_by_id(jwt, id):
         actor = Actor.query.filter(Actor.id == id).one_or_none()
 
         if actor is None:
@@ -110,7 +116,8 @@ def create_app(test_config=None):
     DELETE the movie by id.
     '''
     @app.route('/movies/<int:id>', methods=['DELETE'])
-    def delete_movie_by_id(id):
+    @requires_auth('delete:movies')
+    def delete_movie_by_id(jwt, id):
         movie = Movie.query.filter(Movie.id == id).one_or_none()
 
         if movie is None:
@@ -131,7 +138,8 @@ def create_app(test_config=None):
     Add an actor.
     '''
     @app.route('/actors', methods=['POST'])
-    def add_actor():
+    @requires_auth('post:actors')
+    def add_actor(jwt):
         body = request.get_json()
         name = body.get('name', None)
         age = body.get('age', None)
@@ -155,7 +163,8 @@ def create_app(test_config=None):
     Add a movie.
     '''
     @app.route('/movies', methods=['POST'])
-    def add_movie():
+    @requires_auth('post:movies')
+    def add_movie(jwt):
         body = request.get_json()
         title = body.get('title', None)
         release_date = body.get('release_date', None)
@@ -184,7 +193,8 @@ def create_app(test_config=None):
     Update an actor.
     '''
     @app.route('/actors/<int:id>', methods=['PATCH'])
-    def update_actor(id):
+    @requires_auth('patch:actors')
+    def update_actor(jwt, id):
         actor = Actor.query.filter(Actor.id == id).one_or_none()
 
         if actor is None:
@@ -218,7 +228,8 @@ def create_app(test_config=None):
     Update a movie.
     '''
     @app.route('/movies/<int:id>', methods=['PATCH'])
-    def update_movie(id):
+    @requires_auth('patch:movies')
+    def update_movie(jwt, id):
         movie = Movie.query.filter(Movie.id == id).one_or_none()
 
         if movie is None:
@@ -273,6 +284,14 @@ def create_app(test_config=None):
             "error": 400,
             "message": "bad request"
         }), 400
+
+    @app.errorhandler(AuthError)
+    def auth_error(error):
+        return jsonify({
+            "success": False,
+            "error": error.status_code,
+            "message": error.error['description']
+        }), error.status_code
 
     return app
 

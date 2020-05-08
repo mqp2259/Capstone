@@ -19,7 +19,8 @@ def setup_db(app):
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app
     db.init_app(app)
-    migrate = Migrate(app, db)
+    is_sqlite = database_path.startswith('sqlite:')
+    migrate = Migrate(app, db, render_as_batch=is_sqlite)
 
 '''
 Movie
@@ -30,7 +31,7 @@ class Movie(db.Model):
     # Autoincrementing, unique primary key
     id = db.Column(db.Integer(), primary_key=True)
     # Movie title
-    title = db.Column(db.String(80), unique=True)
+    title = db.Column(db.String(80), nullable=False)
     # Release date
     release_date = db.Column(db.DateTime())
 
@@ -62,7 +63,7 @@ class Actor(db.Model):
     # Autoincrementing, unique primary key
     id = db.Column(db.Integer(), primary_key=True)
     # Name
-    name = db.Column(db.String(80))
+    name = db.Column(db.String(80), nullable=False)
     # Age
     age = db.Column(db.Integer())
     # Gender

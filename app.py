@@ -3,6 +3,7 @@ from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from database.models import *
+from datetime import datetime
 
 
 def create_app(test_config=None):
@@ -52,7 +53,7 @@ def create_app(test_config=None):
     GET the actor by id.
     '''
     @app.route('/actors/<int:id>')
-    def get_actors_by_id(id):
+    def get_actor_by_id(id):
         actor = Actor.query.filter(Actor.id == id).one_or_none()
 
         if actor is None:
@@ -70,7 +71,7 @@ def create_app(test_config=None):
     GET the movie by id.
     '''
     @app.route('/movies/<int:id>')
-    def get_movies_by_id(id):
+    def get_movie_by_id(id):
         movie = Movie.query.filter(Movie.id == id).one_or_none()
 
         if movie is None:
@@ -88,7 +89,7 @@ def create_app(test_config=None):
     DELETE the actor by id.
     '''
     @app.route('/actors/<int:id>', methods=['DELETE'])
-    def delete_actors_by_id(id):
+    def delete_actor_by_id(id):
         actor = Actor.query.filter(Actor.id == id).one_or_none()
 
         if actor is None:
@@ -106,10 +107,10 @@ def create_app(test_config=None):
         })
 
     '''
-    DELETE the actor by id.
+    DELETE the movie by id.
     '''
     @app.route('/movies/<int:id>', methods=['DELETE'])
-    def delete_movies_by_id(id):
+    def delete_movie_by_id(id):
         movie = Movie.query.filter(Movie.id == id).one_or_none()
 
         if movie is None:
@@ -127,47 +128,62 @@ def create_app(test_config=None):
         })
 
     '''
-    DELETE the actor by id.
+    Add an actor.
     '''
-    @app.route('/actors/<int:id>', methods=['DELETE'])
-    def delete_actors_by_id(id):
-        actor = Actor.query.filter(Actor.id == id).one_or_none()
+    @app.route('/actors', methods=['POST'])
+    def add_actor():
+        body = request.get_json()
+        name = body.get('name', None)
+        age = body.get('age', None)
+        gender = body.get('gender', None)
 
-        if actor is None:
-            abort(404)
+        if name is None:
+            abort(400)
 
         try:
-            actor.delete()
+            new_actor = Actor(name=name, age=age, gender=gender)
+            new_actor.insert()
         except:
             abort(422)
 
-
         return jsonify({
             'success': True,
-            'deleted': actor.format(),
+            'added': new_actor.format(),
         })
 
     '''
-    DELETE the actor by id.
+    Add an movie.
     '''
-    @app.route('/movies/<int:id>', methods=['DELETE'])
-    def delete_movies_by_id(id):
-        movie = Movie.query.filter(Movie.id == id).one_or_none()
+    @app.route('/movies', methods=['POST'])
+    def add_movies():
+        body = request.get_json()
+        title = body.get('title', None)
+        release_date = body.get('release_date', None)
 
-        if movie is None:
-            abort(404)
+        if title is None:
+            abort(400)
+
+        if release_date is not None:
+            try:
+                release_date_datetime = datetime.strptime(release_date, "%Y-%m-%d")
+            except:
+                abort(422)
 
         try:
-            movie.delete()
+            new_movie = Movie(title=title, release_date=release_date_datetime)
+            new_movie.insert()
         except:
             abort(422)
 
-
         return jsonify({
             'success': True,
-            'deleted': movie.format(),
+            'added': new_movie.format(),
         })
 
+
+    '''
+    Error handlers
+    '''
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({
@@ -184,10 +200,18 @@ def create_app(test_config=None):
             "message": "unprocessable"
         }), 422
 
+    @app.errorhandler(400)
+    def unprocessable(error):
+        return jsonify({
+            "success": False,
+            "error": 400,
+            "message": "bad request"
+        }), 400
+
     return app
 
 
 APP = create_app()
 
 if __name__ == '__main__':
-    APP.run(host='127.0.0.1', port=8080, debug=True)
+    APP.run(host='127.0.0.1', port=5000, debug=True)

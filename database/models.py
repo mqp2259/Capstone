@@ -34,8 +34,13 @@ class Movie(db.Model):
     # Release date
     release_date = db.Column(db.DateTime())
 
+    def format(self):
+        return {"id": self.id,
+                "title": self.title,
+                "release_date": self.release_date.strftime("%Y-%m-%d")}
+
     def __repr__(self):
-        return 'Movie: title=%s, y=%s' % (self.title, self.release_time)
+        return 'Movie: title=%s, release date=%s' % (self.title, self.release_date)
 
 '''
 Movie
@@ -51,6 +56,12 @@ class Actor(db.Model):
     age = db.Column(db.Integer())
     # Gender
     gender = db.Column(db.String(80))
+
+    def format(self):
+        return {"id": self.id,
+                "name": self.name,
+                "age": self.age,
+                "gender": self.gender}
 
     def __repr__(self):
         return 'Actor: name=%s, age=%d, gender=%s' % (self.name, self.age, self.gender)

@@ -10,8 +10,14 @@ from auth.auth import *
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
-    setup_db(app)
+    setup_db(app, database_path)
     CORS(app)
+
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PATCH,POST,DELETE,OPTIONS')
+        return response
 
     '''
     GET all available actors.
@@ -296,7 +302,8 @@ def create_app(test_config=None):
     return app
 
 
-APP = create_app()
+
 
 if __name__ == '__main__':
+    APP = create_app()
     APP.run(host='127.0.0.1', port=5000, debug=True)

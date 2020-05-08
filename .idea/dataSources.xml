@@ -7,5 +7,11 @@
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:C:\Users\qipei\Dropbox\MOOC\Udacity\Full Stack Developer\capstone\capstone\database\database.db</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="database_test" uuid="f3e410cb-6af1-421c-95fe-c92067b647a3">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:C:\Users\qipei\Dropbox\MOOC\Udacity\Full Stack Developer\capstone\capstone\database_test.db</jdbc-url>
+    </data-source>
   </component>
 </project>

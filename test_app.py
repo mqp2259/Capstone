@@ -156,7 +156,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['added'])
 
-    def test_add_actor_no_permission(self):
+    def test_401_add_actor_no_permission(self):
         """Test add actor with no permission"""
         res = self.client().post('/actors', json=self.new_actor,  headers={'Authorization': "Bearer " + CASTING_ASSISTANT_TOKEN})
         data = json.loads(res.data)
@@ -165,7 +165,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Permission not found.')
 
-    def test_add_actor_no_name(self):
+    def test_400_add_actor_no_name(self):
         """Test add actor with no name"""
         res = self.client().post('/actors', json={},  headers={'Authorization': "Bearer " + CASTING_DIRECTOR_TOKEN})
         data = json.loads(res.data)
@@ -183,7 +183,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['added'])
 
-    def test_add_movie_no_permission(self):
+    def test_401_add_movie_no_permission(self):
         """Test add movie with no permission"""
         res = self.client().post('/movies', json=self.new_actor,  headers={'Authorization': "Bearer " + CASTING_DIRECTOR_TOKEN})
         data = json.loads(res.data)
@@ -192,7 +192,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Permission not found.')
 
-    def test_add_movie_no_title(self):
+    def test_400_add_movie_no_title(self):
         """Test add movie with no title"""
         res = self.client().post('/movies', json={},  headers={'Authorization': "Bearer " + EXECUTIVE_PRODUCER_TOKEN})
         data = json.loads(res.data)
@@ -201,137 +201,61 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'bad request')
 
+    def test_update_actor(self):
+        """Test update actor"""
+        res = self.client().patch('/actors/1', json=self.new_actor,  headers={'Authorization': "Bearer " + CASTING_DIRECTOR_TOKEN})
+        data = json.loads(res.data)
 
-    # def test_retrieve_questions(self):
-    #     res = self.client().get('/questions')
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertTrue(data['questions'])
-    #     self.assertTrue(data['total_questions'])
-    #     self.assertTrue(data['categories'])
-    #
-    # def test_404_retrieve_questions_beyond_valid_page(self):
-    #     res = self.client().get('/questions?page=1000')
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 404)
-    #     self.assertEqual(data['success'], False)
-    #     self.assertEqual(data['message'], 'resource not found')
-    #
-    # def test_delete_question(self):
-    #     res = self.client().delete('/questions/2')
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertTrue(data['deleted'])
-    #     self.assertTrue(data['questions'])
-    #     self.assertTrue(data['total_questions'])
-    #     self.assertTrue(data['categories'])
-    #
-    # def test_422_delete_question_not_exsit(self):
-    #     res = self.client().delete('/questions/1000')
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 422)
-    #     self.assertEqual(data['success'], False)
-    #     self.assertEqual(data['message'], 'unprocessable')
-    #
-    # def test_add_question(self):
-    #     res = self.client().post('/questions', json=self.new_question)
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertTrue(data['created'])
-    #     self.assertTrue(data['questions'])
-    #     self.assertTrue(data['total_questions'])
-    #     self.assertTrue(data['categories'])
-    #
-    # def test_422_add_question_failed(self):
-    #     self.app.config["SQLALCHEMY_DATABASE_URI"] = ""
-    #     res = self.client().post('/questions', json=self.new_question)
-    #     data = json.loads(res.data)
-    #     self.app.config["SQLALCHEMY_DATABASE_URI"] = self.database_path
-    #
-    #     self.assertEqual(res.status_code, 422)
-    #     self.assertEqual(data['success'], False)
-    #     self.assertEqual(data['message'], 'unprocessable')
-    #
-    # def test_search_questions(self):
-    #     res = self.client().post('/questions', json={'searchTerm': 'which'})
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertTrue(data['questions'])
-    #     self.assertTrue(data['total_questions'])
-    #     self.assertTrue(data['categories'])
-    #
-    # def test_404_search_questions_not_exist(self):
-    #     res = self.client().post('/questions', json={'searchTerm': 'Halloween'})
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 404)
-    #     self.assertEqual(data['success'], False)
-    #     self.assertEqual(data['message'], 'resource not found')
-    #
-    # def test_422_search_questions_failed(self):
-    #     self.app.config["SQLALCHEMY_DATABASE_URI"] = ""
-    #     res = self.client().post('/questions', json={'searchTerm': 'Halloween'})
-    #     data = json.loads(res.data)
-    #     self.app.config["SQLALCHEMY_DATABASE_URI"] = self.database_path
-    #
-    #     self.assertEqual(res.status_code, 422)
-    #     self.assertEqual(data['success'], False)
-    #     self.assertEqual(data['message'], 'unprocessable')
-    #
-    # def test_retrieve_questions_by_category(self):
-    #     res = self.client().get('/categories/1/questions')
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertTrue(data['questions'])
-    #     self.assertTrue(data['total_questions'])
-    #     self.assertTrue(data['categories'])
-    #     self.assertEqual(data['current_category'], 1)
-    #
-    # def test_404_retrieve_questions_by_category_category_not_exsit(self):
-    #     res = self.client().get('/categories/100/questions')
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 404)
-    #     self.assertEqual(data['success'], False)
-    #     self.assertEqual(data['message'], 'resource not found')
-    #
-    # def test_422_retrieve_questions_by_category_failed(self):
-    #     self.app.config["SQLALCHEMY_DATABASE_URI"] = ""
-    #     res = self.client().get('/categories/1/questions')
-    #     data = json.loads(res.data)
-    #     self.app.config["SQLALCHEMY_DATABASE_URI"] = self.database_path
-    #
-    #     self.assertEqual(res.status_code, 422)
-    #     self.assertEqual(data['success'], False)
-    #     self.assertEqual(data['message'], 'unprocessable')
-    #
-    # def test_retrieve_quizzes(self):
-    #     res = self.client().post('/quizzes', json={'previous_questions': [], 'quiz_category': {'id': 1}})
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertTrue(data['question'])
-    #
-    # def test_retrieve_quizzes_failed(self):
-    #     res = self.client().post('/quizzes', json={'previous_questions': []})
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 422)
-    #     self.assertEqual(data['success'], False)
-    #     self.assertEqual(data['message'], 'unprocessable')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['updated'])
+
+    def test_401_update_actor_no_permission(self):
+        """Test update actor with no permission"""
+        res = self.client().patch('/actors/1', json=self.new_actor,  headers={'Authorization': "Bearer " + CASTING_ASSISTANT_TOKEN})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Permission not found.')
+
+    def test_404_update_actor_no_exist(self):
+        """Test update actor with id that does not exist"""
+        res = self.client().patch('/actors/100', json=self.new_actor,  headers={'Authorization': "Bearer " + CASTING_DIRECTOR_TOKEN})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
+
+    def test_update_movie(self):
+        """Test update movie"""
+        res = self.client().patch('/movies/1', json=self.new_movie,  headers={'Authorization': "Bearer " + CASTING_DIRECTOR_TOKEN})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['updated'])
+
+    def test_401_update_movie_no_permission(self):
+        """Test update movie with no permission"""
+        res = self.client().patch('/movies/1', json=self.new_movie,  headers={'Authorization': "Bearer " + CASTING_ASSISTANT_TOKEN})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Permission not found.')
+
+    def test_404_update_movie_no_exist(self):
+        """Test update movie with id that does not exist"""
+        res = self.client().patch('/movies/100', json=self.new_movie,  headers={'Authorization': "Bearer " + CASTING_DIRECTOR_TOKEN})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
+
+
 
 
 # Make the tests conveniently executable

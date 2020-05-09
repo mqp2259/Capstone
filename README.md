@@ -6,38 +6,61 @@ The Casting Agency models a company that is responsible for creating movies and 
 
 ## Roles
 
-There are `TODO` comments throughout project. Start by reading the READMEs in:
+There are three roles in this system and their corresponding permissions are shown:
 
-1. [`./frontend/`](./frontend/README.md)
-2. [`./backend/`](./backend/README.md)
+1. Casting Assistant
+  * Can view actors and movies: "get:actors", "get:movies"
+2. Casting Director
+  * All permissions a Casting Assistant has: "get:actors", "get:movies"
+  * and add or delete an actor from the database: "post:actors", "delete:actors"
+  * and modify actors or movies: "patch:actors", "patch:movies"
+3. Executive Producer
+  * All permissions a Casting Director has: "get:actors", "post:actors", "delete:actors", "patch:actors", "get:movies"， "patch:movies"
+  * and add or delete a movie from the database:
+  "post:movies"， "delete:movies"
 
-We recommend following the instructions in those files in order. This order will look familiar from our prior work in the course.
+## Authentication
 
-## Starting and Submitting the Project
+Auth0 is used in this project for authentication. The configuration parameters for Auth0 is stored in /auth/config.py:
+- AUTH0_DOMAIN = 'mqp2259.auth0.com'
+- ALGORITHMS = ['RS256']
+- API_AUDIENCE = 'capstone'
 
-[Fork](https://help.github.com/en/articles/fork-a-repo) the [project repository]() and [Clone](https://help.github.com/en/articles/cloning-a-repository) your forked repository to your machine. Work on the project locally and make sure to push all your changes to the remote repository before submitting the link to your repository in the Classroom. 
+The JWT tokens generated from auth0 are stored in test_app.py file. They are:
+- Casting Assistant: 
+```
+eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImNzR2xDMFB3VnIzaGNGV1AyWGE3aCJ9.eyJpc3MiOiJodHRwczovL21xcDIyNTkuYXV0aDAuY29tLyIsInN1YiI6ImF1dGgwfDVlYWY4Mzc1NTRiMTRjMGMxMjczMzhjYyIsImF1ZCI6ImNhcHN0b25lIiwiaWF0IjoxNTg4OTIwNjE3LCJleHAiOjE1ODkwMDcwMTcsImF6cCI6IkVnVWJBWWxtYXBiZ0xqZlExZ2hLbkhBYUxiRldwc3JVIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJnZXQ6YWN0b3JzIiwiZ2V0Om1vdmllcyJdfQ.Ykkjmbcisi9s1NGdkdyfpWK20e-7evkDCpxqSxT-5mL_zAt_W0FMUD8XKd6otnDHUJW73AvRJRLvgx3dNdmfOhi2pwoZPkKLTKsWCg3US6kej5-5xYRjzIkTD75eVB4wD8O9fDiZnNMs6RncCT0Nl86oIjxjv63C3rXT2ag-zuDQpJ-Prl_VKIsKaioWnz_iLXl8_KafyEuc6YW_kJmbx2Ci8v7lsNXIAZUwNk4Q6-8JBUHy-VwA4ta8ellGoKd37-SJ726W5VXT1Gae6Egfclg2wS6jD6F4ig7g63gUadO14wexiICbmDOa1EASxGnHDNPz6XOE1Egdpq5GCq20zw
+```
+- Casting Director:
+```
+eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImNzR2xDMFB3VnIzaGNGV1AyWGE3aCJ9.eyJpc3MiOiJodHRwczovL21xcDIyNTkuYXV0aDAuY29tLyIsInN1YiI6ImF1dGgwfDVlYjFlY2Y0MWNjMWFjMGMxNDg5NjgxYiIsImF1ZCI6ImNhcHN0b25lIiwiaWF0IjoxNTg4OTIwNzQ0LCJleHAiOjE1ODkwMDcxNDQsImF6cCI6IkVnVWJBWWxtYXBiZ0xqZlExZ2hLbkhBYUxiRldwc3JVIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJkZWxldGU6YWN0b3JzIiwiZ2V0OmFjdG9ycyIsImdldDptb3ZpZXMiLCJwYXRjaDphY3RvcnMiLCJwYXRjaDptb3ZpZXMiLCJwb3N0OmFjdG9ycyJdfQ.n3k1HKkeOdzo7f_LrPHNl4wG5BGZplpccqZjENfmyCjIzmLpl04YmDENSfVKKziAM-lbFMQ-VUA1EM0ZBux4cHZCykzt-_53RtH972WAUyamN7lWaNFFufYlGZOTRulidAF5n4qUnjG-GHH-8drGjVSt9vYKpVlsyhXOFIGvCFhtIIV8HBJ3e1ZzMJ39tYo1MXghGF7D8X5gBZsmGcRvlqe7iuNIeiy0B69Ltnhvg-_2PQZzAjCeLpfN6-UanRlperIIyY6yCG083KuSfjgDvJsbNZcrrFHNsi9zdg_y2y_1_sBpREI1iWKqSJazCEDYGlr6PCr-lS-p1-4XU39r7w
+```
+Executive Producer:
+```
+ eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImNzR2xDMFB3VnIzaGNGV1AyWGE3aCJ9.eyJpc3MiOiJodHRwczovL21xcDIyNTkuYXV0aDAuY29tLyIsInN1YiI6ImF1dGgwfDVlYjUwMDQ4MWNjMWFjMGMxNDkyYmJkNyIsImF1ZCI6ImNhcHN0b25lIiwiaWF0IjoxNTg4OTIwNjkyLCJleHAiOjE1ODkwMDcwOTIsImF6cCI6IkVnVWJBWWxtYXBiZ0xqZlExZ2hLbkhBYUxiRldwc3JVIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJkZWxldGU6YWN0b3JzIiwiZGVsZXRlOm1vdmllcyIsImdldDphY3RvcnMiLCJnZXQ6bW92aWVzIiwicGF0Y2g6YWN0b3JzIiwicGF0Y2g6bW92aWVzIiwicG9zdDphY3RvcnMiLCJwb3N0Om1vdmllcyJdfQ.V9VCmK0K3XWMTfDIbJ4kI_HKOYWN-bJVtnwvZFyzEuOw8wXuDXCXpnyF9I91safFw33ZNvjKQyDZ2BGMY8pKTEiB2ncp9U0u32BhETa5e0iBcUasjPwz8rtMzUn51_ju1XVNJnIgnWJ7dK1mED_FPsT1MFyYcfV198ki319R6PC4iINBIuqNi7d3beMr8ulSEB2NGSNybqFGk0NzvMqxO--P4ZZO0pl7dvjDj9Uybn6cWb4fvjkejzK4v65Y1vJ0tLu7AwmgJ8WuK79ZcB35umJpjL_vUZ7zJJqcVn0aN6GIABWQRrFillakJ0lmosqcsBiMyPskkvNYcV4p-4UnTg
+ ```
 
-## About the Stack
 
-We started the full stack application for you. It is desiged with some key functional areas:
+## Run the project locally
 
-### Backend
+All the requirements are stored in requirements.txt. The following command can be run to install the dependencies:
+```
+pip install -r requirements.txt
+```
 
-The `./backend` directory contains a partially completed Flask and SQLAlchemy server. You will work primarily in app.py to define your endpoints and can reference models.py for DB and SQLAlchemy setup. 
-
-### Frontend
-
-The `./frontend` directory contains a complete React frontend to consume the data from the Flask server. You will need to update the endpoints after you define them in the backend. Those areas are marked with TODO and can be searched for expediency. 
-
-Pay special attention to what data the frontend is expecting from each API response to help guide how you format your API. 
-
-[View the README.md within ./frontend for more details.](./frontend/README.md)
+The main script is app.py. The server can be turned on by using the following commands:
+```
+set FLASK_APP = app.py
+flask run
+```
+The project is tested using pytest and postman. The postman collection file is `capstone.postman_collection.json`. The py test file is `test_app.py`.
+2### Backend
 
 ## API Reference
 
 ### Getting Started
-- Base URL: At present this app can only be run locally and is not hosted as a base URL. The backend app is hosted at the default, `http://127.0.0.1:5000/`, which is set as a proxy in the frontend configuration. 
-- Authentication: This version of the application does not require authentication or API keys. 
+- Base URL: At present this app is hosted at `https://castingagencycapstone.herokuapp.com/`
+- Authentication: the tokens are provided above for test purposes. 
 
 ### Error Handling
 Errors are returned as JSON objects in the following format:
@@ -49,446 +72,206 @@ Errors are returned as JSON objects in the following format:
 }
 ```
 The API will return two error types when requests fail:
+- 400: Bad Request
+- 401: Permission not found
 - 404: Resource Not Found
-- 422: Not Processable 
+- 422: Not Processable
 
 ### Endpoints 
-#### GET /categories
+#### GET /actors
 - General:
-    - Returns a list of categories, success value, and total number of categories
-- Sample: `curl http://127.0.0.1:5000/categories`
+    - Returns a list of actors, success value, and total number of actors
+    - Bearer token should be added in the header to pass the authentication
+    - Roles: Casting Assistant, Casting Director, Executive Producer
+- Sample: `curl https://castingagencycapstone.herokuapp.com/actors`
 ``` 
 {
-  "categories": {
-    "1": "Science", 
-    "2": "Art", 
-    "3": "Geography", 
-    "4": "History", 
-    "5": "Entertainment", 
-    "6": "Sports"
-  }, 
-  "success": true, 
-  "total_categories": 6
+    "actors": [
+        {
+            "age": 30,
+            "gender": "Male",
+            "id": 1,
+            "name": "David"
+        },
+        {
+            "age": 28,
+            "gender": "Male",
+            "id": 3,
+            "name": "David"
+        },
+        {
+            "age": 28,
+            "gender": "Male",
+            "id": 4,
+            "name": "David"
+        }
+    ],
+    "success": true,
+    "total_actors": 3
 }
 ```
-#### GET /questions
+#### GET /movies
 - General:
-    - Returns a list of questions and categories, success value, and total number of questions and current category.
-    - Results are paginated in groups of 10. Include a request argument to choose page number, starting from 1. 
-- Sample: `curl http://127.0.0.1:5000/questions`
-
+    - Returns a list of movies, success value, and total number of movies
+    - Bearer token should be added in the header to pass the authentication
+    - Roles: Casting Assistant, Casting Director, Executive Producer
+- Sample: `curl https://castingagencycapstone.herokuapp.com/movies`
 ``` 
 {
-  "categories": {
-    "1": "Science", 
-    "2": "Art", 
-    "3": "Geography", 
-    "4": "History", 
-    "5": "Entertainment", 
-    "6": "Sports"
-  }, 
-  "current_category": null, 
-  "questions": [
-    {
-      "answer": "Apollo 13", 
-      "category": 5, 
-      "difficulty": 4, 
-      "id": 2, 
-      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
-    }, 
-    {
-      "answer": "Tom Cruise", 
-      "category": 5, 
-      "difficulty": 4, 
-      "id": 4, 
-      "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
-    }, 
-    {
-      "answer": "Maya Angelou", 
-      "category": 4, 
-      "difficulty": 2, 
-      "id": 5, 
-      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
-    }, 
-    {
-      "answer": "Edward Scissorhands", 
-      "category": 5, 
-      "difficulty": 3, 
-      "id": 6, 
-      "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
-    }, 
-    {
-      "answer": "Muhammad Ali", 
-      "category": 4, 
-      "difficulty": 1, 
-      "id": 9, 
-      "question": "What boxer's original name is Cassius Clay?"
-    }, 
-    {
-      "answer": "Brazil", 
-      "category": 6, 
-      "difficulty": 3, 
-      "id": 10, 
-      "question": "Which is the only team to play in every soccer World Cup tournament?"
-    }, 
-    {
-      "answer": "Uruguay", 
-      "category": 6, 
-      "difficulty": 4, 
-      "id": 11, 
-      "question": "Which country won the first ever soccer World Cup in 1930?"
-    }, 
-    {
-      "answer": "George Washington Carver", 
-      "category": 4, 
-      "difficulty": 2, 
-      "id": 12, 
-      "question": "Who invented Peanut Butter?"
-    }, 
-    {
-      "answer": "Lake Victoria", 
-      "category": 3, 
-      "difficulty": 2, 
-      "id": 13, 
-      "question": "What is the largest lake in Africa?"
-    }, 
-    {
-      "answer": "The Palace of Versailles", 
-      "category": 3, 
-      "difficulty": 3, 
-      "id": 14, 
-      "question": "In which royal palace would you find the Hall of Mirrors?"
-    }
-  ], 
-  "success": true, 
-  "total_questions": 19
+    "movies": [
+        {
+            "id": 1,
+            "release_date": "2020-05-20",
+            "title": "Harry Potter 5"
+        },
+        {
+            "id": 2,
+            "release_date": "2020-05-07",
+            "title": "Harry Potter"
+        }
+    ],
+    "success": true,
+    "total_movies": 2
 }
 ```
-#### DELETE /questions/{question_id}
+#### GET /actors/{actor_id}
 - General:
-    - Deletes the question of the given ID if it exists. Returns the id of the deleted question, success value, a list of current categories and questions (on current page number to update the frontend), total number of questions.
-- Sample: `curl -X DELETE http://127.0.0.1:5000/questions/10?page=1`
-```
+    - Returns a single actors by id, success value, and total number of actors (which is 1)
+    - Bearer token should be added in the header to pass the authentication
+    - Roles: Casting Assistant, Casting Director, Executive Producer
+- Sample: `curl https://castingagencycapstone.herokuapp.com/actors/1`
+``` 
 {
-  "categories": {
-    "1": "Science",
-    "2": "Art",
-    "3": "Geography",
-    "4": "History",
-    "5": "Entertainment",
-    "6": "Sports"
-  },
-  "current_category": null,
-  "deleted": 10,
-  "questions": [
-    {
-      "answer": "Apollo 13",
-      "category": 5,
-      "difficulty": 4,
-      "id": 2,
-      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
-    },
-    {
-      "answer": "Tom Cruise",
-      "category": 5,
-      "difficulty": 4,
-      "id": 4,
-      "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
-    },
-    {
-      "answer": "Maya Angelou",
-      "category": 4,
-      "difficulty": 2,
-      "id": 5,
-      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
-    },
-    {
-      "answer": "Edward Scissorhands",
-      "category": 5,
-      "difficulty": 3,
-      "id": 6,
-      "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
-    },
-    {
-      "answer": "Muhammad Ali",
-      "category": 4,
-      "difficulty": 1,
-      "id": 9,
-      "question": "What boxer's original name is Cassius Clay?"
-    },
-    {
-      "answer": "Uruguay",
-      "category": 6,
-      "difficulty": 4,
-      "id": 11,
-      "question": "Which country won the first ever soccer World Cup in 1930?"
-    },
-    {
-      "answer": "George Washington Carver",
-      "category": 4,
-      "difficulty": 2,
-      "id": 12,
-      "question": "Who invented Peanut Butter?"
-    },
-    {
-      "answer": "Lake Victoria",
-      "category": 3,
-      "difficulty": 2,
-      "id": 13,
-      "question": "What is the largest lake in Africa?"
-    },
-    {
-      "answer": "The Palace of Versailles",
-      "category": 3,
-      "difficulty": 3,
-      "id": 14,
-      "question": "In which royal palace would you find the Hall of Mirrors?"
-    },
-    {
-      "answer": "Agra",
-      "category": 3,
-      "difficulty": 2,
-      "id": 15,
-      "question": "The Taj Mahal is located in which Indian city?"
-    }
-  ],
-  "success": true,
-  "total_questions": 18
+    "actors": [
+        {
+            "age": 30,
+            "gender": "Male",
+            "id": 1,
+            "name": "David"
+        }
+    ],
+    "success": true,
+    "total_actors": 1
 }
 ```
-
-#### POST /questions
+#### GET /movies/{movie_id}
 - General:
-    - Creates a new question using the submitted question, answer, difficulty and category. Returns the id of the new question, success value, total number of questions, and current question and category lists based on current page number to update the frontend. 
-- Sample: `curl http://127.0.0.1:5000/questions?page=2 -X POST -H "Content-Type: application/json" -d "{\"question\":\"Who invented Python?\", \"answer\":\"Guido van Rossum\", \"difficulty\":\"5\", \"category\":\"1\"}"`
-```
+    - Returns a single movie by id, success value, and total number of movies (which is 1)
+    - Bearer token should be added in the header to pass the authentication
+    - Roles: Casting Assistant, Casting Director, Executive Producer
+- Sample: `curl https://castingagencycapstone.herokuapp.com/movies/1`
+``` 
 {
-  "categories": {
-    "1": "Science",
-    "2": "Art",
-    "3": "Geography",
-    "4": "History",
-    "5": "Entertainment",
-    "6": "Sports"
-  },
-  "created": 25,
-  "current_category": null,
-  "questions": [
-    {
-      "answer": "Escher",
-      "category": 2,
-      "difficulty": 1,
-      "id": 16,
-      "question": "Which Dutch graphic artist\u2013initials M C was a creator of optical illusions?"
-    },
-    {
-      "answer": "Mona Lisa",
-      "category": 2,
-      "difficulty": 3,
-      "id": 17,
-      "question": "La Giaconda is better known as what?"
-    },
-    {
-      "answer": "One",
-      "category": 2,
-      "difficulty": 4,
-      "id": 18,
-      "question": "How many paintings did Van Gogh sell in his lifetime?"
-    },
-    {
-      "answer": "Jackson Pollock",
-      "category": 2,
-      "difficulty": 2,
-      "id": 19,
-      "question": "Which American artist was a pioneer of Abstract Expressionism, and a leading exponent of action painting?"
-    },
-    {
-      "answer": "The Liver",
-      "category": 1,
-      "difficulty": 4,
-      "id": 20,
-      "question": "What is the heaviest organ in the human body?"
-    },
-    {
-      "answer": "Alexander Fleming",
-      "category": 1,
-      "difficulty": 3,
-      "id": 21,
-      "question": "Who discovered penicillin?"
-    },
-    {
-      "answer": "Blood",
-      "category": 1,
-      "difficulty": 4,
-      "id": 22,
-      "question": "Hematology is a branch of medicine involving the study of what?"
-    },
-    {
-      "answer": "Scarab",
-      "category": 4,
-      "difficulty": 4,
-      "id": 23,
-      "question": "Which dung beetle was worshipped by the ancient Egyptians?"
-    },
-    {
-      "answer": "",
-      "category": 1,
-      "difficulty": 1,
-      "id": 24,
-      "question": ""
-    },
-    {
-      "answer": "Guido van Rossum",
-      "category": 1,
-      "difficulty": 5,
-      "id": 25,
-      "question": "Who invented Python?"
-    }
-  ],
-  "success": true,
-  "total_questions": 20
+    "movies": [
+        {
+            "id": 1,
+            "release_date": "2020-05-20",
+            "title": "Harry Potter 5"
+        }
+    ],
+    "success": true,
+    "total_movies": 1
 }
 ```
-#### POST /questions
+#### DELETE /actors/{actor_id}
 - General:
-    - get questions based on a search term. It returns a list of questions for whom the search term is a substring of the question, a list of categories, total number of categories, and success value. 
-- Sample: `curl http://127.0.0.1:5000/questions -X POST -H "Content-Type: application/json" -d "{\"searchTerm\":\"which\"}"`
+    - Deletes the actor for the given ID if it exists. Returns the info of the deleted actor and success value.
+    - Bearer token should be added in the header to pass the authentication
+    - Roles: Casting Director, Executive Producer
+- Sample: `curl -X DELETE https://castingagencycapstone.herokuapp.com/actors/1`
 ```
 {
-  "categories": {
-    "1": "Science",
-    "2": "Art",
-    "3": "Geography",
-    "4": "History",
-    "5": "Entertainment",
-    "6": "Sports"
-  },
-  "current_category": null,
-  "questions": [
-    {
-      "answer": "Uruguay",
-      "category": 6,
-      "difficulty": 4,
-      "id": 11,
-      "question": "Which country won the first ever soccer World Cup in 1930?"
+    "deleted": {
+        "age": 30,
+        "gender": "Male",
+        "id": 1,
+        "name": "David"
     },
-    {
-      "answer": "The Palace of Versailles",
-      "category": 3,
-      "difficulty": 3,
-      "id": 14,
-      "question": "In which royal palace would you find the Hall of Mirrors?"
-    },
-    {
-      "answer": "Agra",
-      "category": 3,
-      "difficulty": 2,
-      "id": 15,
-      "question": "The Taj Mahal is located in which Indian city?"
-    },
-    {
-      "answer": "Escher",
-      "category": 2,
-      "difficulty": 1,
-      "id": 16,
-      "question": "Which Dutch graphic artist\u2013initials M C was a creator of optical illusions?"
-    },
-    {
-      "answer": "Jackson Pollock",
-      "category": 2,
-      "difficulty": 2,
-      "id": 19,
-      "question": "Which American artist was a pioneer of Abstract Expressionism, and a leading exponent of action painting?"
-    },
-    {
-      "answer": "Scarab",
-      "category": 4,
-      "difficulty": 4,
-      "id": 23,
-      "question": "Which dung beetle was worshipped by the ancient Egyptians?"
-    }
-  ],
-  "success": true,
-  "total_questions": 6
+    "success": true
 }
 ```
-#### GET /categories/{category_id}/questions
+#### DELETE /movies/{movie_id}
 - General:
-    - get questions based on the given category id. It returns a list of questions for a given category, the total number of the questions, a list of categories, current category id, and success value. 
-- Sample: `curl http://127.0.0.1:5000/categories/1/questions`
+    - Deletes the movie for the given ID if it exists. Returns the info of the deleted movie and success value.
+    - Bearer token should be added in the header to pass the authentication
+    - Roles: Executive Producer
+- Sample: `curl -X DELETE https://castingagencycapstone.herokuapp.com/movies/1`
 ```
 {
-  "error": 404,
-  "message": "resource not found",
-  "success": false
-}
-{
-  "categories": {
-    "1": "Science",
-    "2": "Art",
-    "3": "Geography",
-    "4": "History",
-    "5": "Entertainment",
-    "6": "Sports"
-  },
-  "current_category": 1,
-  "questions": [
-    {
-      "answer": "The Liver",
-      "category": 1,
-      "difficulty": 4,
-      "id": 20,
-      "question": "What is the heaviest organ in the human body?"
+    "deleted": {
+        "id": 2,
+        "release_date": "2020-05-07",
+        "title": "Harry Potter"
     },
-    {
-      "answer": "Alexander Fleming",
-      "category": 1,
-      "difficulty": 3,
-      "id": 21,
-      "question": "Who discovered penicillin?"
-    },
-    {
-      "answer": "Blood",
-      "category": 1,
-      "difficulty": 4,
-      "id": 22,
-      "question": "Hematology is a branch of medicine involving the study of what?"
-    },
-    {
-      "answer": "",
-      "category": 1,
-      "difficulty": 1,
-      "id": 24,
-      "question": ""
-    },
-    {
-      "answer": "Guido van Rossum",
-      "category": 1,
-      "difficulty": 5,
-      "id": 25,
-      "question": "Who invented Python?"
-    }
-  ],
-  "success": true,
-  "total_questions": 5
+    "success": true
 }
 ```
-#### POST /quizzes
+#### POST /actors
 - General:
-    - Get next question to play the quiz. Taking category id and previous question id, the endpoint can return a random questions within the given category and success value. If provided, and that is not one of the previous questions. 
-- Sample: `curl http://127.0.0.1:5000/quizzes -X POST -H "Content-Type: application/json" -d "{\"previous_questions\":[],\"quiz_category\": {\"id\": 1}}"`
+    - Creates a new actor using the json string. It returns the added actor and success value. 
+    - Bearer token should be added in the header to pass the authentication
+    - Roles: Casting Director, Executive Producer
+- Sample: `curl https://castingagencycapstone.herokuapp.com/actors -X POST -H "Content-Type: application/json" -d "{\"name\":\"David\", \"age\":28, \"gender\":\"Male\"}"`
 ```
 {
-  "question": {
-    "answer": "",
-    "category": 1,
-    "difficulty": 1,
-    "id": 24,
-    "question": ""
-  },
-  "success": true
+    "added": {
+        "age": 28,
+        "gender": "Male",
+        "id": 5,
+        "name": "David"
+    },
+    "success": true
+}
+```
+#### POST /movies
+- General:
+    - Creates a new movie using the json string. It returns the added movie and success value. 
+    - Bearer token should be added in the header to pass the authentication
+    - Roles: Executive Producer
+- Sample: `curl https://castingagencycapstone.herokuapp.com/actors -X POST -H "Content-Type: application/json" -d "{\"title\":\"Harry Potter\", \"release_date\":\"2020-05-07\"}"`
+```
+{
+    "added": {
+        "id": 2,
+        "release_date": "2020-05-07",
+        "title": "Harry Potter"
+    },
+    "success": true
+}
+```
+#### PATCH /actors/{actor_id}
+- General:
+    - Updates an actor by the given id using the json string. It returns the updated actor and success value. 
+    - Bearer token should be added in the header to pass the authentication
+    - Roles: Casting Director, Executive Producer
+- Sample: `curl https://castingagencycapstone.herokuapp.com/actors/3 -X PATCH -H "Content-Type: application/json" -d "{\"name\":\"David\", \"age\":30, \"gender\":\"Male\"}"`
+```
+{
+    "success": true,
+    "updated": {
+        "age": 30,
+        "gender": "Male",
+        "id": 3,
+        "name": "David"
+    }
+}
+```
+#### PATCH /movies
+- General:
+    - Updates a movie by the given id using the json string. It returns the updated movie and success value. 
+    - Bearer token should be added in the header to pass the authentication
+    - Roles: Casting Director, Executive Producer
+- Sample: `curl https://castingagencycapstone.herokuapp.com/movies/1 -X POST -H "Content-Type: application/json" -d "{\"title\":\"Harry Potter 5\", \"release_date\":\"2020-05-20\"}"`
+```
+{
+    "success": true,
+    "updated": {
+        "id": 1,
+        "release_date": "2020-05-20",
+        "title": "Harry Potter 5"
+    }
 }
 ```
 
 ## Authors
-The project was completed by Qipei Mei as part of the Udacity Fully stack developer Nanodegree
+The project was completed by Qipei Mei as the capstone project of the Udacity Fully Stack Developer Nanodegree

@@ -255,8 +255,59 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource not found')
 
+    def test_delete_actor(self):
+        """Test delete actor"""
+        res = self.client().delete('/actors/1',  headers={'Authorization': "Bearer " + CASTING_DIRECTOR_TOKEN})
+        data = json.loads(res.data)
 
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['deleted'])
 
+    def test_401_delete_actor_no_permission(self):
+        """Test delete actor with no permission"""
+        res = self.client().delete('/actors/1',  headers={'Authorization': "Bearer " + CASTING_ASSISTANT_TOKEN})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Permission not found.')
+
+    def test_404_delete_actor_no_exist(self):
+        """Test delete actor with id that does not exist"""
+        res = self.client().delete('/actors/100',  headers={'Authorization': "Bearer " + CASTING_DIRECTOR_TOKEN})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
+
+    def test_delete_movie(self):
+        """Test delte movie"""
+        res = self.client().delete('/movies/1',  headers={'Authorization': "Bearer " + EXECUTIVE_PRODUCER_TOKEN})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['deleted'])
+
+    def test_401_delete_movie_no_permission(self):
+        """Test delete movie with no permission"""
+        res = self.client().delete('/movies/1',  headers={'Authorization': "Bearer " + CASTING_DIRECTOR_TOKEN})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Permission not found.')
+
+    def test_404_delete_movie_no_exist(self):
+        """Test delete movie with id that does not exist"""
+        res = self.client().patch('/movies/100',  headers={'Authorization': "Bearer " + EXECUTIVE_PRODUCER_TOKEN})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
 
 # Make the tests conveniently executable
 if __name__ == "__main__":

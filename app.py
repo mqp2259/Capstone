@@ -301,9 +301,9 @@ def create_app(test_config=None):
 
     return app
 
-
+app = create_app()
 
 
 if __name__ == '__main__':
-    APP = create_app()
-    APP.run(host='127.0.0.1', port=5000, debug=True)
+
+    app.run(host='127.0.0.1', port=5000, debug=True)
